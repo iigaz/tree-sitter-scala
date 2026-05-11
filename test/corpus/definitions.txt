@@ -815,6 +815,7 @@ implicit final sealed class Point {
 
 private[a] class D[T] private (x: T) {
   private[a] def b: Byte
+  private[this] def c: Int
 }
 
 --------------------------------------------------------------------------------
@@ -849,6 +850,12 @@ private[a] class D[T] private (x: T) {
           (access_modifier
             (access_qualifier
               (identifier))))
+        (identifier)
+        (type_identifier))
+      (function_declaration
+        (modifiers
+          (access_modifier
+            (access_qualifier)))
         (identifier)
         (type_identifier)))))
 

@@ -886,7 +886,7 @@ module.exports = grammar({
         seq(choice("private", "protected"), optional($.access_qualifier)),
       ),
 
-    access_qualifier: $ => seq("[", $._identifier, "]"),
+    access_qualifier: $ => seq("[", choice($._identifier, "this"), "]"),
 
     inline_modifier: $ => prec("mod", "inline"),
     infix_modifier: $ => prec("mod", "infix"),
@@ -1154,7 +1154,7 @@ module.exports = grammar({
     stable_identifier: $ =>
       prec.left(
         PREC.stable_id,
-        seq(choice($._identifier, $.stable_identifier), ".", $._identifier),
+        seq(choice($._identifier, $.stable_identifier, $.this_expression), ".", $._identifier),
       ),
 
     generic_type: $ =>
