@@ -73,6 +73,7 @@ module.exports = grammar({
     ["self_type", "lambda"],
     ["annotation", "applied_constructor_type"],
     ["constructor_application", "applied_constructor_type"],
+    ["self_type", "this_expression"]
   ],
 
   conflicts: $ => [
@@ -156,9 +157,72 @@ module.exports = grammar({
     [$._annotated_type, $._simple_expression],
     // '['  identifier  ':'  '{'  wildcard  •  '['  …
     [$.generic_type, $._simple_expression],
+    // identifier  •  '.'  …
+    [$._simple_expression, $.super_expression, $.this_expression],
   ],
 
   word: $ => $._alpha_identifier,
+
+  reserved: {
+    global: $ => [
+      'abstract',
+      'class',
+      'catch',
+      'case',
+      'def',
+      'do',
+      'else',
+      'enum', // Scala 3
+      'export', // Scala 3
+      'extends',
+      'false',
+      'final',
+      'finally',
+      'for',
+      // 'forSome', // Scala 2
+      'given', // Scala 3
+      'if',
+      'implicit',
+      'import',
+      'lazy',
+      'macro', // Scala 2
+      token.immediate('match'),
+      'new',
+      'null',
+      'object',
+      'override',
+      'package',
+      'private',
+      'protected',
+      'return',
+      'sealed',
+      'super',
+      'this',
+      'then', // Scala 3
+      'throw',
+      'trait',
+      'true',
+      'try',
+      'type',
+      'val',
+      'var',
+      'while',
+      'with',
+      'yield',
+      '_', // Scala 2
+      ':',
+      '=',
+      '<-',
+      '=>',
+      '<:',
+      '<%', // Scala 2
+      '>:',
+      '#',
+      '@',
+      '=>>', // Scala 3
+      '?=>', // Scala 3
+    ],
+  },
 
   rules: {
     // TopStats          ::=  TopStat {semi TopStat}
@@ -534,8 +598,16 @@ module.exports = grammar({
         prec(
           "self_type",
           seq(
-            choice($._identifier, $.wildcard),
-            optional($._self_type_ascription),
+            choice(
+              seq(
+                choice($._identifier, $.wildcard),
+                optional($._self_type_ascription),
+              ),
+              seq(
+                "this",
+                $._self_type_ascription,
+              )
+            ),
             "=>",
           ),
         ),
@@ -1066,7 +1138,7 @@ module.exports = grammar({
     singleton_type: $ =>
       prec.left(
         PREC.stable_type_id,
-        seq(choice($._identifier, $.stable_identifier), ".", "type"),
+        seq(choice($._identifier, $.stable_identifier, $.this_expression), ".", "type"),
       ),
 
     stable_type_identifier: $ =>
@@ -1293,6 +1365,8 @@ module.exports = grammar({
         $.generic_function,
         $.call_expression,
         alias($._dot_match_expression, $.match_expression),
+        $.this_expression,
+        $.super_expression,
       ),
 
     _single_lambda_param: $ =>
@@ -1666,6 +1740,15 @@ module.exports = grammar({
           choice(seq("{", $._block, "}"), seq("[", $._type, "]"), $.identifier),
         ),
       ),
+
+    this_expression: $ =>
+      prec(
+        "this_expression",
+        seq(optional(seq($.identifier, ".")), "this"),
+      ),
+
+    super_expression: $ =>
+      seq(optional(seq($.identifier, ".")), "super", optional(seq("[", $.identifier, "]")), ".", $.identifier),
 
     /**
      * id               ::=  plainid

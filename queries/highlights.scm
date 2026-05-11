@@ -247,13 +247,9 @@
 (operator_identifier) @operator
 
 ((identifier) @type (#match? @type "^[A-Z]"))
-((identifier) @variable.builtin
- (#match? @variable.builtin "^this$"))
 
-(
-  (identifier) @function.builtin
-  (#match? @function.builtin "^super$")
-)
+(this_expression ("this") @variable.builtin)
+(super_expression ("super") @function.builtin)
 
 ;; Scala CLI using directives
 (using_directive_key) @parameter
