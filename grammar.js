@@ -68,7 +68,7 @@ module.exports = grammar({
   // These names can be used in the prec functions to define precedence relative only to other names in the array, rather than globally.
   precedences: $ => [
     ["mod", "soft_id"],
-    ["end", "soft_id"],
+    ["end", "this_id", "soft_id"],
     ["new", "structural_type"],
     ["self_type", "lambda"],
     ["annotation", "applied_constructor_type"],
@@ -159,6 +159,55 @@ module.exports = grammar({
   ],
 
   word: $ => $._alpha_identifier,
+
+  reserved: {
+    global: $ => [
+      'abstract',
+      'case',
+      // 'catch',
+      'class',
+      'def',
+      'do',
+      // 'else',
+      'enum', // Scala 3
+      'export', // Scala 3
+      'extends',
+      'false',
+      'final',
+      'finally',
+      'for',
+      // 'forSome', // Scala 2, not implemented
+      'given', // Scala 3
+      // 'if',
+      'implicit',
+      'import',
+      'lazy',
+      'macro', // Scala 2
+      token.immediate('match'),
+      'new',
+      'null',
+      'object',
+      'override',
+      'package',
+      'private',
+      'protected',
+      'return',
+      'sealed',
+      'super',
+      // 'then', // Scala 3
+      'this',
+      'throw',
+      'trait',
+      'true',
+      'try',
+      'type',
+      'val',
+      'var',
+      'while',
+      // 'with',
+      'yield',
+    ],
+  },
 
   rules: {
     // TopStats          ::=  TopStat {semi TopStat}
@@ -1672,7 +1721,10 @@ module.exports = grammar({
      *                       |  ‘`’ { charNoBackQuoteOrNewline | UnicodeEscape | charEscapeSeq
      */
     identifier: $ =>
-      choice($._alpha_identifier, $._backquoted_id, $._soft_identifier),
+      choice($._alpha_identifier, $._backquoted_id, $._soft_identifier, $._this_identifier, $._super_identifier),
+
+    _this_identifier: $ => prec("this_id", "this"),
+    _super_identifier: $ => "super",
 
     // https://docs.scala-lang.org/scala3/reference/soft-modifier.html
     _soft_identifier: $ =>
