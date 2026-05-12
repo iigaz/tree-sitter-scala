@@ -486,10 +486,6 @@ bool tree_sitter_scala_external_scanner_scan(void *payload, TSLexer *lexer,
       }
     }
 
-    if (valid_symbols[ELSE]) {
-      return !scan_word(lexer, "else");
-    }
-
     if (valid_symbols[CATCH]) {
       if (scan_word(lexer, "catch")) {
         return false;
@@ -518,6 +514,10 @@ bool tree_sitter_scala_external_scanner_scan(void *payload, TSLexer *lexer,
       if (scan_word(lexer, "derives")) {
         return false;
       }
+    }
+
+    if (valid_symbols[ELSE]) {
+      return !scan_word(lexer, "else");
     }
 
     if (newline_count > 1) {

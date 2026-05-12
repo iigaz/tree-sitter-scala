@@ -59,6 +59,17 @@ object Hello {
     self: X =>
 //  ^parameter
 //        ^type
+
+    def foo = super[Object].toString
+//  ^ keyword.function
+//      ^ method
+//            ^ function.builtin
+//                  ^ type
+
+    def bar = this.toString
+//  ^ keyword.function
+//      ^ method
+//             ^ variable.builtin
   }
 
   type A = { def fly(): Unit }

@@ -134,6 +134,13 @@ val x = y
   (comment))
 
 ================================================================================
+Reserved keywords
+:error
+================================================================================
+
+val val = ???
+
+================================================================================
 Package
 ================================================================================
 
@@ -808,6 +815,7 @@ implicit final sealed class Point {
 
 private[a] class D[T] private (x: T) {
   private[a] def b: Byte
+  private[this] def c: Int
 }
 
 --------------------------------------------------------------------------------
@@ -842,6 +850,12 @@ private[a] class D[T] private (x: T) {
           (access_modifier
             (access_qualifier
               (identifier))))
+        (identifier)
+        (type_identifier))
+      (function_declaration
+        (modifiers
+          (access_modifier
+            (access_qualifier)))
         (identifier)
         (type_identifier)))))
 
@@ -1821,6 +1835,11 @@ trait C {
   def a = 1
 }
 
+trait D {
+  this: SomeOtherTrait =>
+  def foo = someId
+}
+
 --------------------------------------------------------------------------------
 
 (compilation_unit
@@ -1865,7 +1884,15 @@ trait C {
           (type_identifier)))
       (function_definition
         (identifier)
-        (integer_literal)))))
+        (integer_literal))))
+  (trait_definition
+    (identifier)
+    (template_body
+      (self_type
+        (type_identifier))
+      (function_definition
+        (identifier)
+        (identifier)))))
 
 ================================================================================
 Inline methods and parameters (Scala 3)
@@ -1993,7 +2020,6 @@ transparent trait Kind:
     (identifier)
     (template_body
       (self_type
-        (identifier)
         (type_identifier))
       (function_definition
         (identifier)
